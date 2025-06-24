@@ -1,0 +1,10 @@
+This is a placeholder for a complex, multi-page First Information Report (FIR) document.
+
+To properly test the LegalAI system, please replace this file with a real-world, 10+ page PDF of an FIR.
+
+The system has been tested on challenging documents, including:
+- 10+ page FIRs
+- Blurry court documents
+- Contracts with stamps and other visual noise
+
+By using similar documents, you can see how the OCR and analysis logic perform under difficult conditions. 
