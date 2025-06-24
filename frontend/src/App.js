@@ -8,6 +8,7 @@ function App() {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const resultRef = useRef(null);
+  const [excelUrl, setExcelUrl] = useState(null);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -51,6 +52,35 @@ function App() {
       setAnalysis({
         error: `Failed to analyze document. Error: ${error.message}`
       });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleExcelDownload = async () => {
+    if (!file) return;
+    setLoading(true);
+    setExcelUrl(null);
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const response = await fetch("http://localhost:8000/extract_sanction_excel/", {
+        method: "POST",
+        body: formData,
+      });
+      if (!response.ok) throw new Error("Failed to generate Excel file");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      setExcelUrl(url);
+      // Auto-download
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "sanction_letter.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (error) {
+      alert("Error downloading Excel: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -114,6 +144,18 @@ function App() {
           >
             {loading ? "Analyzing..." : "Analyze Document"}
           </button>
+          <button
+            onClick={handleExcelDownload}
+            disabled={!file || loading}
+            style={{ marginLeft: 10 }}
+          >
+            Download Excel
+          </button>
+          {excelUrl && (
+            <a href={excelUrl} download="sanction_letter.xlsx" style={{ marginLeft: 10 }}>
+              Click here if download does not start
+            </a>
+          )}
         </div>
         
         <div className="content">
